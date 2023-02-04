@@ -24,7 +24,7 @@ class fileDB(object):
 		else:
 			self.db = "config"
 
-	def get(self, name, default_value=None):
+	def get(self, name, default_value=False):
 		"""Get value by data's name. Default value is for the arguemants do not exist"""
 		try:
 			conf = open(self.db,'r')

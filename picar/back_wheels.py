@@ -24,19 +24,23 @@ class Back_Wheels(object):
 	PWM_A = 4
 	PWM_B = 5
 
-	_DEBUG = False
+	_DEBUG = True
 	_DEBUG_INFO = 'DEBUG "back_wheels.py":'
-
+	LOGFILE='/var/log/picar/picar.log'
 	def __init__(self, debug=False, bus_number=1, db="config"):
 		''' Init the direction channel and pwm channel '''
 		self.forward_A = True
 		self.forward_B = True
-
 		self.db = filedb.fileDB(db=db)
+		msg = 'From DB:\nforwardA:' + str(bool(self.db.get('forward_A')))
+		msg+='\nforwardB:' + str(bool(self.db.get('forward_B')))
+		self._debug_(msg)
+		self.forward_A = bool(self.db.get('forward_A'))
+		self.forward_B = bool(self.db.get('forward_B'))
 
-		self.forward_A = int(self.db.get('forward_A', default_value=1))
-		self.forward_B = int(self.db.get('forward_B', default_value=1))
-
+		msg = 'Passing To Motor Driver:\nforwardA:' + str(self.forward_A)
+		msg+='\nforwardB:' + str(self.forward_B)
+		self._debug_(msg)
 		self.left_wheel = TB6612.Motor(self.Motor_A, offset=self.forward_A)
 		self.right_wheel = TB6612.Motor(self.Motor_B, offset=self.forward_B)
 
@@ -61,6 +65,8 @@ class Back_Wheels(object):
 	def _debug_(self,message):
 		if self._DEBUG:
 			print(self._DEBUG_INFO,message)
+		with open(self.LOGFILE,'a') as logfile:
+			logfile.write(self._DEBUG_INFO+message+'\n')
 
 	def forward(self):
 		''' Move both wheels forward '''
